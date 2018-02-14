@@ -17,7 +17,9 @@ RUN apt-get update \
         libuuid1 \
         zlib1g \
     && rm -rf /var/lib/apt/lists/*
-    
+
+LABEL tag=2.0-runtime-deps-stretch
+
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         curl \
@@ -35,6 +37,9 @@ RUN curl -SL $DOTNET_DOWNLOAD_URL --output dotnet.tar.gz \
     && rm dotnet.tar.gz \
     && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
 
+LABEL tag=2.0-runtime-deps-stretch
+
 WORKDIR /app
 COPY Clock.* ./
-ENTRYPOINT ["dotnet", "./Clock.dll"]
+ENTRYPOINT ["dotnet"]
+CMD ["Clock.dll"]
