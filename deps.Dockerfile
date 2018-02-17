@@ -1,5 +1,4 @@
-ARG RESIN_MACHINE_NAME
-FROM resin/${RESIN_MACHINE_NAME}-debian:stretch
+FROM resin/${ResinMachineName}-debian:stretch
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \

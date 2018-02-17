@@ -1,5 +1,4 @@
-ARG RESIN_MACHINE_NAME
-FROM resin/${RESIN_MACHINE_NAME}-debian:stretch
+FROM resin/artik710-debian:stretch
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -18,3 +17,4 @@ RUN apt-get update \
         libuuid1 \
         zlib1g \
     && rm -rf /var/lib/apt/lists/*
+

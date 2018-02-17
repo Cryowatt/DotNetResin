@@ -6,17 +6,15 @@ $resinMachines = @('raspberry-pi','raspberry-pi2','beaglebone-black','intel-edis
     'jetson-tx2','iot2000','jetson-tx1')
 
 $resinMachines | % {
-    $resinMachine = $_   
-    $depsImage = "cryowatt/$resinMachine-dotnet-deps"
-    $runtimeImage = "cryowatt/$resinMachine-dotnet"
+    $ResinMachineName = $_
+    $depsImage = "cryowatt/$ResinMachineName-dotnet-deps"
+    $runtimeImage = "cryowatt/$ResinMachineName-dotnet"
 
-    New-Item -ItemType Directory -Path "devices\$resinMachine" -Force
+    New-Item -ItemType Directory -Path "devices\$ResinMachineName" -Force
 
-    Get-Content -Path .\deps.Dockerfile | 
-        ForEach-Object { $_ -replace "%%RESIN_MACHINE_NAME%%", $resinMachine} | 
-        Set-Content -Path "devices\$resinMachine\deps.Dockerfile"
+    $ExecutionContext.InvokeCommand.ExpandString((Get-Content .\deps.Dockerfile | Out-String)) |
+        Set-Content -Path "devices\$ResinMachineName\deps.Dockerfile"
 
-    Get-Content -Path .\runtime.Dockerfile | 
-        ForEach-Object { $_ -replace "%%RESIN_MACHINE_NAME%%", $resinMachine} | 
-        Set-Content -Path "devices\$resinMachine\runtime.Dockerfile"
+        $ExecutionContext.InvokeCommand.ExpandString((Get-Content .\runtime.Dockerfile | Out-String)) |
+        Set-Content -Path "devices\$ResinMachineName\runtime.Dockerfile"
 }
