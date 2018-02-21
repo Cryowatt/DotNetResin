@@ -9,15 +9,8 @@ $resinMachines = @('raspberry-pi','raspberry-pi2','beaglebone-black','intel-edis
 
 $resinMachines | ForEach-Object {
     $ResinMachineName = $_
-    $DockerFile = "deps.Dockerfile"
-    
-    $ImageSuffix = "dotnet-deps"
     $jobBody = $ExecutionContext.InvokeCommand.ExpandString((Get-Content .\AutomatedBuild.json | Out-String))
-    Invoke-RestMethod -Headers @{Authorization = "JWT $jwt"} -Method Delete https://hub.docker.com/v2/repositories/cryowatt/$ResinMachineName-$ImageSuffix/
-    Invoke-RestMethod -Headers @{Authorization = "JWT $jwt"} -Method Post -ContentType "application/json" https://hub.docker.com/v2/repositories/cryowatt/$ResinMachineName-$ImageSuffix/autobuild/ -Body $jobBody
-
-    $ImageSuffix = "dotnet"
-    $jobBody = $ExecutionContext.InvokeCommand.ExpandString((Get-Content .\AutomatedBuild.json | Out-String))
-    Invoke-RestMethod -Headers @{Authorization = "JWT $jwt"} -Method Delete https://hub.docker.com/v2/repositories/cryowatt/$ResinMachineName-$ImageSuffix/
-    Invoke-RestMethod -Headers @{Authorization = "JWT $jwt"} -Method Post -ContentType "application/json" https://hub.docker.com/v2/repositories/cryowatt/$ResinMachineName-$ImageSuffix/autobuild/ -Body $jobBody
+    #Invoke-RestMethod -Headers @{Authorization = "JWT $jwt"} -Method Delete https://hub.docker.com/v2/repositories/cryowatt/$ResinMachineName-dotnet/
+    $jobBody -replace "`r|`n|`t|\s{2,}", ""
+    Invoke-RestMethod -Headers @{Authorization = "JWT $jwt"} -Method Post -ContentType "application/json" https://hub.docker.com/v2/repositories/cryowatt/$ResinMachineName-dotnet/autobuild/ -Body $jobBody
 }
