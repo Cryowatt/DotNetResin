@@ -1,5 +1,5 @@
 FROM resin/odroid-xu4-debian:stretch
-
+RUN [ "cross-build-start" ]
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
@@ -30,4 +30,5 @@ RUN curl -SL $DOTNET_DOWNLOAD_URL --output dotnet.tar.gz \
     && tar -zxf dotnet.tar.gz -C /usr/share/dotnet \
     && rm dotnet.tar.gz \
     && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
+RUN [ "cross-build-end" ]
 

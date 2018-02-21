@@ -1,5 +1,5 @@
 FROM resin/ts7700-debian:stretch
-
+RUN [ "cross-build-start" ]
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
@@ -17,4 +17,5 @@ RUN apt-get update \
         libuuid1 \
         zlib1g \
     && rm -rf /var/lib/apt/lists/*
+RUN [ "cross-build-end" ]
 
