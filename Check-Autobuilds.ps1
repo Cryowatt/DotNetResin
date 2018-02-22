@@ -8,5 +8,9 @@ $resinMachines = @(
 
 $resinMachines | ForEach-Object {
     $ResinMachineName = $_
-    Invoke-RestMethod -Headers @{Authorization = "JWT $jwt"} https://hub.docker.com/v2/repositories/cryowatt/$ResinMachineName-dotnet/buildhistory/
+    $response = Invoke-RestMethod -Headers @{Authorization = "JWT $jwt"} https://hub.docker.com/v2/repositories/cryowatt/$ResinMachineName-dotnet/buildhistory/
+    $response.results | ForEach-Object {
+        Add-Member -InputObject $_ -MemberType NoteProperty -Name "Image" -Value "cryowatt/$ResinMachineName-dotnet"
+        Write-Output $_
+    }
 }
