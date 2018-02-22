@@ -1,4 +1,4 @@
-FROM resin/intel-nuc-debian:stretch
+FROM resin/zynq-xz702-debian:stretch
 RUN [ "cross-build-start" ]
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
