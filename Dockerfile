@@ -2,6 +2,8 @@
 ARG DEVICE_NAME
 FROM resin/${DEVICE_NAME}-debian:stretch AS runtime-deps
 
+RUN [ "cross-build-start" ]
+
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates \   
@@ -21,12 +23,13 @@ RUN apt-get update \
 ENV ASPNETCORE_URLS=http://+:80 \
     # Enable detection of running in a container
     DOTNET_RUNNING_IN_CONTAINER=true
-
+RUN [ "cross-build-end" ]
 
 
 #### RUNTIME ####
 FROM runtime-deps AS runtime
 
+RUN [ "cross-build-start" ]
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         curl \
@@ -46,3 +49,4 @@ RUN curl -SL --output dotnet.tar.gz ${DOTNET_PACKAGE} \
     && tar -zxf dotnet.tar.gz -C /usr/share/dotnet \
     && rm dotnet.tar.gz \
     && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
+RUN [ "cross-build-end" ]
