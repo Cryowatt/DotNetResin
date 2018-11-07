@@ -35,6 +35,7 @@ foreach($release in $releases) {
         Write-Verbose DOTNET_VERSION=$version
         Write-Verbose DOTNET_PACKAGE=$downloadBlob
         Write-Verbose DOTNET_SHA512=$dotnetChecksum
+        & docker pull $versionTag | Write-Verbose
         & docker build `
             --build-arg DEVICE_NAME=$deviceName `
             --build-arg DOTNET_VERSION=$version `
