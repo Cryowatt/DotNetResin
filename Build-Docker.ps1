@@ -10,7 +10,7 @@ $deviceName = "raspberry-pi2"
 $versions = @{}
 $versionPrefix = "cryowatt/resin:$deviceName-dotnet"
 
-& docker pull resin/${DEVICE_NAME}-debian:stretch
+docker pull resin/${DEVICE_NAME}-debian:stretch
 
 foreach($release in $releases) {
     $version = [System.Management.Automation.SemanticVersion]$release.'version-runtime'
@@ -35,8 +35,8 @@ foreach($release in $releases) {
         Write-Verbose DOTNET_VERSION=$version
         Write-Verbose DOTNET_PACKAGE=$downloadBlob
         Write-Verbose DOTNET_SHA512=$dotnetChecksum
-        & docker pull $versionTag | Write-Verbose
-        & docker build `
+        docker pull $versionTag | Write-Verbose
+        docker build `
             --build-arg DEVICE_NAME=$deviceName `
             --build-arg DOTNET_VERSION=$version `
             --build-arg DOTNET_PACKAGE=$downloadBlob `
@@ -45,7 +45,7 @@ foreach($release in $releases) {
             . | Write-Verbose
 
         Write-Progress -Activity "Building container for dotnet $versionTag" -CurrentOperation "Pushing container" -ParentId 1
-		& docker push $versionTag
+		docker push $versionTag
 
         if (-not $?) {
             throw "Failed to build container $versionTag"
@@ -66,8 +66,8 @@ $versions.Keys | Group-Object -Property Major | ForEach-Object {
     }
     
     Write-Verbose "Tagging $($versions[$topVersion]) <- $versionPrefix-$($topVersion.Major)"
-    & docker tag $($versions[$topVersion]) $versionPrefix-$($topVersion.Major) | Write-Verbose
-	& docker push $versionPrefix-$($topVersion.Major)
+    docker tag $($versions[$topVersion]) $versionPrefix-$($topVersion.Major) | Write-Verbose
+	docker push $versionPrefix-$($topVersion.Major)
     
     if (-not $?) {
         throw "Tagging failed $($versions[$topVersion]) <- $versionPrefix-$($topVersion.Major)"
@@ -85,8 +85,8 @@ $versions.Keys | Group-Object -Property Major, Minor | ForEach-Object {
     }
     
     Write-Verbose "Tagging $($versions[$topVersion]) <- $versionPrefix-$($topVersion.Major).$($topVersion.Minor)"
-    & docker tag $versions[$topVersion] $versionPrefix-$($topVersion.Major).$($topVersion.Minor)
-	& docker push $versionPrefix-$($topVersion.Major).$($topVersion.Minor)
+    docker tag $versions[$topVersion] $versionPrefix-$($topVersion.Major).$($topVersion.Minor)
+	docker push $versionPrefix-$($topVersion.Major).$($topVersion.Minor)
     
     if (-not $?) {
         throw "Tagging failed $($versions[$topVersion]) <- $versionPrefix-$($topVersion.Major).$($topVersion.Minor)"
@@ -102,8 +102,8 @@ if($topVersion -eq $null) {
 }
 
 Write-Verbose "Tagging $($versions[$topVersion]) <- $versionPrefix"
-& docker tag $versions[$topVersion] $versionPrefix
-& docker push $versionPrefix
+docker tag $versions[$topVersion] $versionPrefix
+docker push $versionPrefix
 
 if (-not $?) {
     throw "Tagging failed $($versions[$topVersion]) <- $versionPrefix"
