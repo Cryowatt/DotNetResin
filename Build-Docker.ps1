@@ -1,14 +1,16 @@
 [cmdletbinding()]
 param(
-    [switch]$TagOnly=$false)
+    # Resin device name
+    [Parameter(Mandatory = $true)]
+    [string]
+    $DeviceName)
 
 Write-Progress -Activity "Building resin docker containers." -CurrentOperation "Downloading releases metadata." -Id 1
 $releases = Invoke-RestMethod https://raw.githubusercontent.com/dotnet/core/master/release-notes/releases.json
 $releases = $releases | Where-Object { $_.'runtime-linux-arm-x32' -ne $null }
 $releaseCount = 0
-$deviceName = "raspberry-pi2"
 $versions = @{}
-$versionPrefix = "cryowatt/resin:$deviceName-dotnet"
+$versionPrefix = "cryowatt/resin:$DeviceName-dotnet"
 
 docker pull resin/${DEVICE_NAME}-debian:stretch
 
@@ -31,13 +33,13 @@ foreach($release in $releases) {
 
         Write-Progress -Activity "Building container for dotnet $versionTag" -CurrentOperation "Building container" -ParentId 1
 
-        Write-Verbose DEVICE_NAME=$deviceName 
+        Write-Verbose DEVICE_NAME=$DeviceName 
         Write-Verbose DOTNET_VERSION=$version
         Write-Verbose DOTNET_PACKAGE=$downloadBlob
         Write-Verbose DOTNET_SHA512=$dotnetChecksum
         docker pull $versionTag | Write-Verbose
         docker build `
-            --build-arg DEVICE_NAME=$deviceName `
+            --build-arg DEVICE_NAME=$DeviceName `
             --build-arg DOTNET_VERSION=$version `
             --build-arg DOTNET_PACKAGE=$downloadBlob `
             --build-arg DOTNET_SHA512=$dotnetChecksum `
@@ -97,7 +99,7 @@ $versions.Keys | Group-Object -Property Major, Minor | ForEach-Object {
 Write-Progress -Activity "Tagging latest version" -ParentId 1
 
 $topVersion = $versions.Keys | Where-Object { $_.PreReleaseLabel -eq $null } | Sort-Object -Descending | Select-Object -First 1
-if($topVersion -eq $null) {
+if($null -eq $topVersion) {
     $topVersion = $_.Group | Sort-Object -Descending | Select-Object -First 1      
 }
 
