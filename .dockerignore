@@ -1,2 +1,4 @@
+.vs
+.git
 .gitignore
 Build-Docker.ps1
