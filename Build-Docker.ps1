@@ -44,6 +44,9 @@ foreach($release in $releases) {
             --tag $versionTag `
             . | Write-Verbose
 
+        Write-Progress -Activity "Building container for dotnet $versionTag" -CurrentOperation "Pushing container" -ParentId 1
+		& docker push $versionTag
+
         if (-not $?) {
             throw "Failed to build container $versionTag"
         }
@@ -63,7 +66,8 @@ $versions.Keys | Group-Object -Property Major | ForEach-Object {
     }
     
     Write-Verbose "Tagging $($versions[$topVersion]) <- $versionPrefix-$($topVersion.Major)"
-    docker tag $($versions[$topVersion]) $versionPrefix-$($topVersion.Major) | Write-Verbose
+    & docker tag $($versions[$topVersion]) $versionPrefix-$($topVersion.Major) | Write-Verbose
+	& docker push $versionPrefix-$($topVersion.Major)
     
     if (-not $?) {
         throw "Tagging failed $($versions[$topVersion]) <- $versionPrefix-$($topVersion.Major)"
@@ -81,7 +85,8 @@ $versions.Keys | Group-Object -Property Major, Minor | ForEach-Object {
     }
     
     Write-Verbose "Tagging $($versions[$topVersion]) <- $versionPrefix-$($topVersion.Major).$($topVersion.Minor)"
-    docker tag $versions[$topVersion] $versionPrefix-$($topVersion.Major).$($topVersion.Minor)
+    & docker tag $versions[$topVersion] $versionPrefix-$($topVersion.Major).$($topVersion.Minor)
+	& docker push $versionPrefix-$($topVersion.Major).$($topVersion.Minor)
     
     if (-not $?) {
         throw "Tagging failed $($versions[$topVersion]) <- $versionPrefix-$($topVersion.Major).$($topVersion.Minor)"
@@ -97,14 +102,9 @@ if($topVersion -eq $null) {
 }
 
 Write-Verbose "Tagging $($versions[$topVersion]) <- $versionPrefix"
-docker tag $versions[$topVersion] $versionPrefix
+& docker tag $versions[$topVersion] $versionPrefix
+& docker push $versionPrefix
 
 if (-not $?) {
     throw "Tagging failed $($versions[$topVersion]) <- $versionPrefix"
-}
-
-$i = 0
-$versions.Values | ForEach-Object {
-    Write-Progress -Activity "Pushing images" -CurrentOperation "Pushing $_" -PercentComplete (($i++ / $versions.Count) * 100) -ParentId 1
-    & docker push $_
 }
