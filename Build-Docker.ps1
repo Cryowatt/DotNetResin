@@ -17,6 +17,7 @@ Write-Progress -Activity "Building container for dotnet $versionPrefix-runtime-d
 docker pull resin/${DEVICE_NAME}-debian:stretch
 docker build `
     --cache-from $versionPrefix-runtime-deps `
+    --target runtime-deps `
     --build-arg DEVICE_NAME=$DeviceName `
     --build-arg DOTNET_VERSION=$version `
     --build-arg DOTNET_PACKAGE=$downloadBlob `
