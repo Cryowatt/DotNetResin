@@ -10,7 +10,7 @@ $releases = Invoke-RestMethod https://raw.githubusercontent.com/dotnet/core/mast
 $releases = $releases | Where-Object { $_.'runtime-linux-arm-x32' -ne $null }
 $releaseCount = 0
 $versions = @{}
-$versionPrefix = "cryowatt/resin:$DeviceName-dotnet"
+$versionPrefix = "cryowatt/resin-dotnet:$DeviceName"
 
 docker pull resin/${DEVICE_NAME}-debian:stretch
 
