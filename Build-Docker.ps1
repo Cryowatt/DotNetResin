@@ -12,7 +12,20 @@ $releaseCount = 0
 $versions = @{}
 $versionPrefix = "cryowatt/resin-dotnet:$DeviceName"
 
+
+Write-Progress -Activity "Building container for dotnet $versionPrefix-runtime-deps" -CurrentOperation "Downloading checksums" -ParentId 1
 docker pull resin/${DEVICE_NAME}-debian:stretch
+docker build `
+    --cache-from $versionPrefix-runtime-deps `
+    --build-arg DEVICE_NAME=$DeviceName `
+    --build-arg DOTNET_VERSION=$version `
+    --build-arg DOTNET_PACKAGE=$downloadBlob `
+    --build-arg DOTNET_SHA512=$dotnetChecksum `
+    --tag $versionPrefix-runtime-deps `
+    . | Write-Verbose
+
+    Write-Progress -Activity "Building container for dotnet $versionPrefix-runtime-deps" -CurrentOperation "Pushing container" -ParentId 1
+docker push $versionPrefix-runtime-deps | Write-Verbose
 
 foreach($release in $releases) {
     $version = [System.Management.Automation.SemanticVersion]$release.'version-runtime'
@@ -37,7 +50,6 @@ foreach($release in $releases) {
         Write-Verbose DOTNET_VERSION=$version
         Write-Verbose DOTNET_PACKAGE=$downloadBlob
         Write-Verbose DOTNET_SHA512=$dotnetChecksum
-        docker pull $versionTag | Write-Verbose
         docker build `
             --cache-from $versionTag `
             --build-arg DEVICE_NAME=$DeviceName `
